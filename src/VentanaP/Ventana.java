@@ -1,6 +1,7 @@
 package VentanaP;
 
 import Hilos.Pato;
+import Hilos.SonidoDisparo;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -274,25 +275,9 @@ public class Ventana extends JFrame
 
     private static void sonidoD()
     {
-        try
-        {
-            File arch = new File("C:\\Users\\Francisco\\Downloads\\Nueva carpeta\\CazaPatos\\shot.wav");
-            AudioInputStream audio = AudioSystem.getAudioInputStream(arch);
-            Clip clip = AudioSystem.getClip();
-            clip.open(audio);
-            System.out.println("Si entra");
-            clip.start();
-            while (clip.isRunning())
-            {
-                Thread.sleep(50);
-            }
-            System.out.println("No suena");
-            clip.close();
-            audio.close();
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException | InterruptedException e)
-        {
-            System.err.println("Error al reproducir Sonido" + e.getMessage());
-        }
+        SonidoDisparo a = new SonidoDisparo();
+        Thread b = new Thread(a);
+        b.start();
     }
 
     private void mostrarCuadradoTemporal(JLayeredPane panel, int x, int y)
