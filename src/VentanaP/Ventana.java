@@ -13,11 +13,6 @@ import java.awt.Font;
 import java.awt.FontFormatException;
 import java.io.File;
 import java.io.IOException;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  *
@@ -379,8 +374,39 @@ public class Ventana extends JFrame
 
     public static void main(String[] args)
     {
-        int nP = Integer.parseInt(JOptionPane.showInputDialog(null, "Ingrese el numero de patos", "ingrese Patos", JOptionPane.QUESTION_MESSAGE));
-        Ventana m = new Ventana(nP);
-        m.setVisible(true);
+
+        do
+        {
+            try
+            {
+                String oP = (JOptionPane.showInputDialog(null,
+                        "Ingrese el numero de patos", "ingrese Patos",
+                        JOptionPane.QUESTION_MESSAGE));
+                if (oP == null)
+                {
+                    JOptionPane.showMessageDialog(null, "Se cancelo la ejecucion", "Cerrando", JOptionPane.CLOSED_OPTION);
+                    return;
+                } else
+                {
+                    if (oP.trim().isEmpty())
+                    {
+                        JOptionPane.showMessageDialog(null, "No se ingreso ningun valor", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                        continue;
+                    }
+                }
+                int nP = Integer.parseInt(oP);
+                if (nP > 0)
+                {
+                    Ventana m = new Ventana(nP);
+                    m.setVisible(true);
+                } else
+                {
+                    JOptionPane.showMessageDialog(null, "El valor debe ser mayor a 0", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException e)
+            {
+                JOptionPane.showMessageDialog(null, "Entrada no valida, Ingrese una cantidad positiva", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            }
+        } while (true);
     }
 }
