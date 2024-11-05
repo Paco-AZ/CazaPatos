@@ -1,19 +1,14 @@
 package VentanaP;
 
+import Controlador.Configuraciones;
 import Hilos.Pato;
 import Hilos.Perro;
 import Hilos.SonidoDisparo;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Random;
-import java.awt.Font;
-import java.awt.FontFormatException;
-import java.io.File;
-import java.io.IOException;
 
 /**
  *
@@ -49,13 +44,13 @@ public class Ventana extends JFrame
         fondoP = new JLayeredPane();
         fondoP.setPreferredSize(tamP);
         lContador = new JLabel("Numero de patos: " + numPatos);
-        setFuenteEstilo8Bits(lContador, 12);
+        Configuraciones.setFuenteEstilo8Bits(lContador, 12, this);
         lContador.setForeground(Color.WHITE);
         lContador.setBounds(250, 20, 240, 30);
         fondoP.add(lContador, JLayeredPane.POPUP_LAYER);
 
-        fondo("src\\imagenes\\world.png", JLayeredPane.MODAL_LAYER);
-        fondo("src\\imagenes\\fondo.png", JLayeredPane.DEFAULT_LAYER);
+        Configuraciones.fondo("src\\imagenes\\world.png", JLayeredPane.MODAL_LAYER, fondoP);
+        Configuraciones.fondo("src\\imagenes\\fondo.png", JLayeredPane.DEFAULT_LAYER, fondoP);
 //        iniciarAnimacion(numPatos);
         perro = new Perro("src/imagenes/Perro/", this, numPatos);
         Thread a = new Thread(perro);
@@ -75,35 +70,6 @@ public class Ventana extends JFrame
     {
         this.fondoP = fondoP;
     }
-
-    public void fondo(String ruta, Object profundidad)
-    {
-        // Crear un panel
-        JLayeredPane panel = new JLayeredPane()
-        {
-            @Override
-            protected void paintComponent(Graphics g)
-            {
-                super.paintComponent(g);
-                // Fondo negro predeterminado
-                g.setColor(Color.BLACK);
-                g.fillRect(0, 0, getWidth(), getHeight());
-            }
-        };
-
-        // Cargar las imágenes
-        ImageIcon imagen = new ImageIcon(ruta); // Imagen adicional
-
-        // Crear etiquetas con las imágenes
-        JLabel etiquetaConImagen = new JLabel(imagen);
-
-        // Establecer posiciones y dimensiones de las etiquetas
-        etiquetaConImagen.setBounds(0, 0, anc, alt); // Imagen secundaria
-
-        fondoP.add(etiquetaConImagen, profundidad);  // Imagen secundaria
-    }
-
-    
 
     public void iniciarJ(int nP)
     {
@@ -146,37 +112,13 @@ public class Ventana extends JFrame
                 int x = e.getX();
                 int y = e.getY();
                 // Iniciar hilo para cambiar el color de fondo y mostrar el cuadrado temporalmente
-                new Thread(() -> mostrarCuadradoTemporal(fondoP, x + 70 - etiquetaConImagen.getWidth() + etiquetaConImagen.x, y + 70 - etiquetaConImagen.getHeight() + etiquetaConImagen.y)).start();
+                new Thread(() -> Configuraciones.mostrarCuadradoTemporal(fondoP, x + 70 - etiquetaConImagen.getWidth() + etiquetaConImagen.x, y + 70 - etiquetaConImagen.getHeight() + etiquetaConImagen.y)).start();
                 etiquetaConImagen.setVivo(false);
                 lBContador.setText("X" + (--balas));
                 new SonidoDisparo();
             }
         });
         fondoP.add(etiquetaConImagen, profundidad);  // Imagen secundaria
-    }
-
-    public void mostrarCuadradoTemporal(JLayeredPane panel, int x, int y)
-    {
-        try
-        {
-            // Hacer la pantalla negra y dibujar el cuadrado blanco
-            Graphics g = panel.getGraphics();
-            g.setColor(Color.BLACK);
-            g.fillRect(0, 0, panel.getWidth(), panel.getHeight());
-
-            // Dibujar el cuadrado blanco en la posición del clic
-            g.setColor(Color.WHITE);
-            g.fillRect(x - 10, y - 10, 20, 20);
-
-            // Pausar por 50 ms
-            Thread.sleep(50);
-
-            // Restaurar el panel (vuelve a pintar)
-            panel.repaint();
-        } catch (InterruptedException ex)
-        {
-            ex.printStackTrace();
-        }
     }
 
     public synchronized void hiloTerminado()
@@ -218,7 +160,7 @@ public class Ventana extends JFrame
         {
             lContador.setBounds(anc / 2 - lContador.getWidth(), alt / 2 - lContador.getHeight() - 50,
                     lContador.getWidth() * 3, lContador.getHeight() * 3);
-            setFuenteEstilo8Bits(lContador, 27);
+            Configuraciones.setFuenteEstilo8Bits(lContador, 27, this);
             lContador.setForeground(Color.red);
             repaint(); // Redibuja la ventana para aplicar los cambios
 
@@ -232,24 +174,6 @@ public class Ventana extends JFrame
 
             System.exit(0); // Finaliza la aplicación
             dispose();
-        }
-    }
-
-    public void setFuenteEstilo8Bits(JLabel contador, int size)
-    {
-        try
-        {
-            // Cargar la fuente personalizada
-            Font font = Font.createFont(Font.TRUETYPE_FONT, new File("press_start_2p\\PressStart2P.ttf"));
-            font = font.deriveFont(Font.BOLD, size); // Ajusta el tamaño y el estilo
-
-            // Aplicar la fuente al JLabel
-            contador.setFont(font);
-            repaint(); // Redibuja la ventana para aplicar los cambios
-
-        } catch (FontFormatException | IOException e)
-        {
-            e.printStackTrace();
         }
     }
 

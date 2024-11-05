@@ -1,5 +1,6 @@
 package Hilos;
 
+import Controlador.Configuraciones;
 import VentanaP.Ventana;
 import static VentanaP.Ventana.balas;
 import java.awt.Color;
@@ -90,7 +91,7 @@ public class Perro extends JLabel implements Runnable
         v.getFondoP().add(v.bala, JLayeredPane.DRAG_LAYER);
 
         v.lBContador = new JLabel("X" + balas);
-        v.setFuenteEstilo8Bits(v.lBContador, 22);
+        Configuraciones.setFuenteEstilo8Bits(v.lBContador, 22,v);
         v.lBContador.setForeground(Color.WHITE);
         v.lBContador.setBounds(30, 350, 240, 30);
         v.getFondoP().add(v.lBContador, JLayeredPane.POPUP_LAYER);
@@ -105,7 +106,7 @@ public class Perro extends JLabel implements Runnable
                 @Override
                 public void mouseClicked(MouseEvent e)
                 {
-                    v.mostrarCuadradoTemporal(v.getFondoP(), e.getX(), e.getY());
+                    Configuraciones.mostrarCuadradoTemporal(v.getFondoP(), e.getX(), e.getY());
                     balas -= balas != 0 ? 1 : 0;
                     v.lBContador.setText("X" + balas);
                     new SonidoDisparo();
@@ -118,8 +119,8 @@ public class Perro extends JLabel implements Runnable
     public void perroS()
     {
         int yP = 300;
-        y = yP; // Iniciar en la posición Y del pato caído
-        boolean sOb = true; // Bandera para controlar el movimiento
+        y = yP; 
+        boolean sOb = true; 
 
         setIcon(new ImageIcon(ruta + "oneDuck.png"));
 
