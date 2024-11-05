@@ -12,6 +12,13 @@ import java.io.IOException;
 public class SonidoDisparo implements Runnable
 {
 
+    public SonidoDisparo()
+    {
+        Thread shot = new Thread(this);
+        shot.start();
+    }
+
+    
     public static void reproducirSonido(String archivo)
     {
         try (FileInputStream fis = new FileInputStream(archivo))

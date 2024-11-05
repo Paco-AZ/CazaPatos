@@ -58,7 +58,9 @@ public class Pato extends JLabel implements Runnable
     {
         if (!vivo)
         {
-            v.perroS("src\\imagenes\\Perro\\", getX());
+            v.perro.x=getX();
+            Thread a =new Thread(() -> v.perro.perroS());
+            a.start();
         }
         v.hiloTerminado();
     }
@@ -139,7 +141,7 @@ public class Pato extends JLabel implements Runnable
                 setBounds(x, y + j, imagen.getIconWidth(), imagen.getIconHeight());
                 Thread.sleep(50);
             }
-            Ventana.contador += (!vivo ? (color.equals("negro") ? 200 : color.equals("azul") ? 250 : 300) : 0);
+//            Ventana.contador += (!vivo ? (color.equals("negro") ? 200 : color.equals("azul") ? 250 : 300) : 0);
 
         } catch (InterruptedException e)
         {
@@ -151,6 +153,7 @@ public class Pato extends JLabel implements Runnable
         {
             setIcon(null);
             Ventana.contHilos--; // Decrementa el contador cuando un pato termina
+            Ventana.contador = (Ventana.contHilos);
 
             finalizar();
         }

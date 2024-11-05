@@ -1,6 +1,7 @@
 package VentanaP;
 
 import Hilos.Pato;
+import Hilos.Perro;
 import Hilos.SonidoDisparo;
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +25,6 @@ public class Ventana extends JFrame
     Dimension tamP = new Dimension(512, 450);
     public int alt = tamP.height;
     private JLabel animacionLabel;
-    private JLabel perro;
     public static int contador = 0;
     public static int balas;
     public JLabel bala;
@@ -32,6 +32,7 @@ public class Ventana extends JFrame
     public JLabel lBContador;
     public int anc = tamP.width;
     private JLayeredPane fondoP;
+    public Perro perro;
     public Pato[] pato;
     public Thread hPato[];
     Random random = new Random();
@@ -47,18 +48,32 @@ public class Ventana extends JFrame
 
         fondoP = new JLayeredPane();
         fondoP.setPreferredSize(tamP);
-        lContador = new JLabel("Puntuacion: 0");
+        lContador = new JLabel("Numero de patos: " + numPatos);
         setFuenteEstilo8Bits(lContador, 12);
         lContador.setForeground(Color.WHITE);
-        lContador.setBounds(280, 20, 240, 30);
+        lContador.setBounds(250, 20, 240, 30);
         fondoP.add(lContador, JLayeredPane.POPUP_LAYER);
 
         fondo("src\\imagenes\\world.png", JLayeredPane.MODAL_LAYER);
         fondo("src\\imagenes\\fondo.png", JLayeredPane.DEFAULT_LAYER);
 //        iniciarAnimacion(numPatos);
-        perro("src\\imagenes\\Perro\\dog", JLayeredPane.POPUP_LAYER, numPatos);
+        perro = new Perro("src/imagenes/Perro/", this, numPatos);
+        Thread a = new Thread(perro);
+        fondoP.add(perro, JLayeredPane.POPUP_LAYER);
+        a.start();
+        
         this.add(fondoP);
         this.setVisible(true);
+    }
+
+    public JLayeredPane getFondoP()
+    {
+        return fondoP;
+    }
+
+    public void setFondoP(JLayeredPane fondoP)
+    {
+        this.fondoP = fondoP;
     }
 
     public void fondo(String ruta, Object profundidad)
@@ -88,134 +103,7 @@ public class Ventana extends JFrame
         fondoP.add(etiquetaConImagen, profundidad);  // Imagen secundaria
     }
 
-    public void perro(String ruta, Object profundidad, int np)
-    {
-        JLayeredPane panel = new JLayeredPane()
-        {
-            @Override
-            protected void paintComponent(Graphics g)
-            {
-                super.paintComponent(g);
-                g.setColor(Color.BLACK);
-                g.fillRect(0, 0, getWidth(), getHeight());
-            }
-        };
-        ImageIcon imagen = new ImageIcon(ruta + "right" + 1 + ".png");
-        perro = new JLabel(imagen);
-        perro.setBounds(-10, 270, imagen.getIconWidth(), imagen.getIconHeight());
-        fondoP.add(perro, profundidad);
-        int delay = 50;
-        Timer timer = new Timer(delay, new ActionListener()
-        {
-            int x = 1;
-            int y = 1;
-            int z = 1;
-
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                perro.setIcon(new ImageIcon(ruta + "right" + (x % 4 + 1) + ".png"));
-                perro.setLocation(x * 5, perro.getY());
-
-                if (perro.getX() >= 200)
-                {
-                    perro.setIcon(new ImageIcon(ruta + "jump" + (x % 2 + 1) + ".png"));
-                    perro.setLocation(perro.getX(), perro.getY() - (z == 1 ? y : 0) * 5);
-                    if (perro.getY() < 200 || z > 1)
-                    {
-                        fondoP.setLayer(perro, JLayeredPane.PALETTE_LAYER);
-                        perro.setIcon(new ImageIcon(ruta + "jump" + (x % 2 + 1) + ".png"));
-                        perro.setLocation(perro.getX(), perro.getY() + z * 5);
-                        if (perro.getY() > 290)
-                        {
-                            ((Timer) e.getSource()).stop();
-                            perro.setIcon(new ImageIcon(ruta + "laught" + (x % 2 + 1) + ".png"));
-                            iniciarJ(np);
-                            ImageIcon imagenB = new ImageIcon("src\\imagenes\\bala azul.PNG");
-                            bala = new JLabel(imagenB);
-                            bala.setBounds(0, 340, imagenB.getIconWidth(), imagenB.getIconHeight());
-                            fondoP.add(bala, JLayeredPane.DRAG_LAYER);
-                            lBContador = new JLabel("X" + balas);
-                            setFuenteEstilo8Bits(lBContador, 22);
-                            lBContador.setForeground(Color.WHITE);
-                            lBContador.setBounds(30, 350, 240, 30);
-                            fondoP.add(lBContador, JLayeredPane.POPUP_LAYER);
-                            if (balas != 0)
-                            {
-                                fondoP.addMouseListener(new MouseAdapter()
-                                {
-
-                                    @Override
-                                    public void mouseClicked(MouseEvent e)
-                                    {
-
-                                        // Si se clickea en el fondo
-                                        mostrarCuadradoTemporal(fondoP, e.getX(), e.getY());
-                                        balas -= balas != 0 ? 1 : 0;
-                                        lBContador.setText("X" + balas);
-                                        Thread shot = new Thread(() -> sonidoD());
-                                        shot.start();
-
-                                    }
-                                });
-                            }
-                        } else
-                        {
-                            z++;
-                        }
-                    } else
-                    {
-                        if (z == 1)
-                        {
-                            y++;
-                        }
-                    }
-                } else
-                {
-                    x++;
-                }
-            }
-        });
-        timer.start();
-    }
-
-    public void perroS(String ruta, int xP)
-    {
-        int yP = 300;
-        int delay = 50;
-
-        Timer timer = new Timer(delay, new ActionListener()
-        {
-            int y = yP; // Iniciar en la posición Y del pato caído
-            boolean sOb = true; // Bandera para controlar el movimiento
-
-            @Override
-            public void actionPerformed(ActionEvent e)
-            {
-                perro.setIcon(new ImageIcon(ruta + "oneDuck.png"));
-
-                if (sOb)
-                {
-                    y -= 5;
-                } else
-                {
-                    y += 5;
-                }
-                perro.setLocation(xP, y);
-                if (y <= yP - 80)
-                {
-                    sOb = false;
-                }
-                if (y >= yP)
-                {
-                    ((Timer) e.getSource()).stop();
-                }
-            }
-        });
-
-        // Iniciar el temporizador
-        timer.start();
-    }
+    
 
     public void iniciarJ(int nP)
     {
@@ -226,7 +114,7 @@ public class Ventana extends JFrame
         {
             int nA = random.nextInt(200 - 0 + 1);
             pato[i] = new Pato((nA % 3 == 0 ? "negro" : nA % 3 == 1 ? "azul" : "rojo"), this); // Pasa la instancia de Ventana
-            Hilos(pato[i], JLayeredPane.PALETTE_LAYER);
+            patos(pato[i], JLayeredPane.PALETTE_LAYER);
             hPato[i] = new Thread(pato[i]); // hilo Pato
             hPato[i].setDaemon(true); // Hace que el hilo pato sea un hilo demonio
             hPato[i].start();
@@ -234,7 +122,7 @@ public class Ventana extends JFrame
         }
     }
 
-    public void Hilos(Pato etiquetaConImagen, Object profundidad)
+    public void patos(Pato etiquetaConImagen, Object profundidad)
     {
         // Crear un panel
         JLayeredPane panel = new JLayeredPane()
@@ -261,21 +149,13 @@ public class Ventana extends JFrame
                 new Thread(() -> mostrarCuadradoTemporal(fondoP, x + 70 - etiquetaConImagen.getWidth() + etiquetaConImagen.x, y + 70 - etiquetaConImagen.getHeight() + etiquetaConImagen.y)).start();
                 etiquetaConImagen.setVivo(false);
                 lBContador.setText("X" + (--balas));
-                Thread shot = new Thread(() -> sonidoD());
-                shot.start();
+                new SonidoDisparo();
             }
         });
         fondoP.add(etiquetaConImagen, profundidad);  // Imagen secundaria
     }
 
-    private static void sonidoD()
-    {
-        SonidoDisparo a = new SonidoDisparo();
-        Thread b = new Thread(a);
-        b.start();
-    }
-
-    private void mostrarCuadradoTemporal(JLayeredPane panel, int x, int y)
+    public void mostrarCuadradoTemporal(JLayeredPane panel, int x, int y)
     {
         try
         {
@@ -302,23 +182,24 @@ public class Ventana extends JFrame
     public synchronized void hiloTerminado()
     {
 
-        lContador.setText("Puntuacion: " + contador);
-        if (contHilos < 5)
-        {
-            for (int i = 0; i < pato.length; i++)
-            {
-                if (pato[i].isVivo() && !pato[i].isEscapa())
-                {
-                    pato[i].setEscapa(true);
-                }
-            }
-            ImageIcon flyAI = new ImageIcon("src\\imagenes\\flyAway.png");
-            JLabel flyA = new JLabel(flyAI);
-            flyA.setBounds(320, 350, flyAI.getIconWidth(), flyAI.getIconHeight());
-            fondoP.add(flyA, JLayeredPane.DRAG_LAYER);
-            fondoP.repaint();
-            add(fondoP);
-        }
+        lContador.setText("Numero de patos: " + contador);
+        //Comandos para que escapen los patos
+//        if (contHilos < 5)
+//        {
+//            for (int i = 0; i < pato.length; i++)
+//            {
+//                if (pato[i].isVivo() && !pato[i].isEscapa())
+//                {
+//                    pato[i].setEscapa(true);
+//                }
+//            }
+//            ImageIcon flyAI = new ImageIcon("src\\imagenes\\flyAway.png");
+//            JLabel flyA = new JLabel(flyAI);
+//            flyA.setBounds(320, 350, flyAI.getIconWidth(), flyAI.getIconHeight());
+//            fondoP.add(flyA, JLayeredPane.DRAG_LAYER);
+//            fondoP.repaint();
+//            add(fondoP);
+//        }
         if (balas <= 0 && contHilos != 0)
         {
             ImageIcon gameOI = new ImageIcon("src\\imagenes\\gameOver.png");
@@ -399,6 +280,7 @@ public class Ventana extends JFrame
                 {
                     Ventana m = new Ventana(nP);
                     m.setVisible(true);
+                    break;
                 } else
                 {
                     JOptionPane.showMessageDialog(null, "El valor debe ser mayor a 0", "Error", JOptionPane.ERROR_MESSAGE);
