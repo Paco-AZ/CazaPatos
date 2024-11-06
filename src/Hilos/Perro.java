@@ -73,7 +73,7 @@ public class Perro extends JLabel implements Runnable
                 Thread.sleep(50);
             }
 
-            v.iniciarJ(nP);
+            v.c.iniciarJ(nP);
             inicializarComponentesJuego();
             manejarClics();
         } catch (InterruptedException e)

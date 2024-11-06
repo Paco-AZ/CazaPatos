@@ -1,5 +1,6 @@
 package Hilos;
 
+import Controlador.Configuraciones;
 import VentanaP.Ventana;
 import javax.swing.*;
 import java.util.Random;
@@ -61,7 +62,7 @@ public class Pato extends JLabel implements Runnable
             Thread a =new Thread(() -> v.perro.perroS());
             a.start();
         }
-        v.hiloTerminado();
+        v.c.hiloTerminado();
     }
 
     @Override
